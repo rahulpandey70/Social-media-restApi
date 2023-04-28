@@ -1,5 +1,7 @@
 # Creating Social Media Rest Api Using Fast Api
 
+    In this rest api i'm using FastApi and Postgres Database to store data.
+
 ## Getting Started
 
     Create vitual env
