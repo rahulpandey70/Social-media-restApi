@@ -11,6 +11,6 @@
 ## To run
 
     Use Command
-        uvicorn main:app --reload
+        uvicorn app.main:app --reload
 
     This command will continuously check if anything you do changes in your file.
