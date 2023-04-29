@@ -2,6 +2,9 @@ from fastapi import Body, FastAPI, Response, HTTPException
 from pydantic import BaseModel
 from typing import Optional
 from random import randrange
+import psycopg2
+from psycopg2.extras import RealDictCursor
+import time
 
 app = FastAPI()
 
@@ -12,6 +15,19 @@ class Post(BaseModel):
     published: bool = True
     rating: Optional[int] = None
 
+
+# connect to database
+while True:
+    try:
+        conn = psycopg2.connect(
+            host='localhost', database='socialmediaapi', user='postgres', password='password123', cursor_factory=RealDictCursor)
+        cur = conn.cursor()
+        print("Connnection to database is successfull")
+        break
+    except Exception as error:
+        print("Connection to database is failed")
+        print("Error: ", error)
+        time.sleep(3)
 
 my_posts = [
     {"title": "title1", "content": "content for title1", "id": 1},
@@ -44,28 +60,33 @@ async def root():
 
 @app.get("/posts")
 async def getPost():
-    return {"Data": my_posts}
+    cur.execute("""SELECT * FROM posts""")
+    posts = cur.fetchall()
+    return {"Data": posts}
 
 # Create Post
 
 
 @app.post("/posts", status_code=201)
-async def createPost(newPost: Post):
-    posts = newPost.dict()
-    posts["id"] = randrange(0, 1000000)
-    my_posts.append(posts)
-    return {"message": newPost}
+async def createPost(post: Post):
+    cur.execute("""INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING * """,
+                (post.title, post.content, post.published))
+    new_post = cur.fetchone()
+
+    conn.commit()
+
+    return {"message": new_post}
 
 # Get Single Post
 
 
 @app.get("/posts/{id}")
 async def get_post(id: int):
-    post = find_post(id)
+    cur.execute("""SELECT * FROM posts WHERE id = %s""", (str(id)))
+    post = cur.fetchone()
     if not post:
         raise HTTPException(
             status_code=404, detail=f"post with id {id} not found")
-    print(post)
     return {"post detail": post}
 
 # Delete Post
@@ -74,26 +95,27 @@ async def get_post(id: int):
 @app.delete("/posts/{id}", status_code=204)
 async def delete_post(id: int):
 
-    index = find_post_index(id)
-    if index == None:
+    cur.execute("""DELETE FROM posts WHERE id = %s RETURNING *""", (str(id)))
+    deletedPost = cur.fetchone()
+    conn.commit()
+
+    if deletedPost == None:
         raise HTTPException(
             status_code=404, detail=f"post with id {id} doesn't exist")
 
-    my_posts.pop(index)
     return Response(status_code=204)
 
 
 # Update Post
 @app.put("/posts/{id}")
 async def update_post(id: int, post: Post):
+    cur.execute("""UPDATE posts SET title = %s, content = %s, published = %s WHERE id = %s RETURNING *""",
+                (post.title, post.content, post.published, str(id)))
+    updatedPost = cur.fetchone()
+    conn.commit()
 
-    index = find_post_index(id)
-    if index == None:
+    if updatedPost == None:
         raise HTTPException(
             status_code=404, detail=f"post with id {id} doesn't exist")
 
-    post = post.dict()
-    post["id"] = id
-    my_posts[index] = post
-
-    return {"data": post}
+    return {"data": updatedPost}
