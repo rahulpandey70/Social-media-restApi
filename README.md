@@ -12,6 +12,16 @@
         Command:-
             pip install fastapi[all]
 
+    Install 'psycopg2-binary'
+    This is a postgresql database adapter that will connect to your postgressql database
+        Command:-
+            pip install psycopg2-binary
+
+    install 'sqlalchemy'
+    This is a python SQL toolkit and ORM(Object Relational Mapper) that gives you flexibility to wirte sql query
+        command:-
+            pip install sqlalchemy
+
 ## To run locally
 
     Use Command:-
