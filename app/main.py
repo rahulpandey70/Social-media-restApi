@@ -3,14 +3,12 @@ from pydantic import BaseModel
 from typing import Optional, List
 from random import randrange
 import psycopg2
-from passlib.context import CryptContext
 from psycopg2.extras import RealDictCursor
 import time
-from . import models, schemas
+from . import models, schemas, utils
 from .database import engine, get_db
 from sqlalchemy.orm import Session
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
@@ -106,7 +104,7 @@ def update_post(id: int, post: schemas.CreatePost, db: Session = Depends(get_db)
 def create_user(user: schemas.CreateUser, db: Session = Depends(get_db)):
 
     # Hash the password
-    hashed_password = pwd_context.hash(user.password)
+    hashed_password = utils.hashPassword(user.password)
     user.password = hashed_password
 
     new_user = models.User(**user.dict())
