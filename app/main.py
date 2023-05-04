@@ -113,3 +113,12 @@ def create_user(user: schemas.CreateUser, db: Session = Depends(get_db)):
     db.refresh(new_user)
 
     return new_user
+
+
+# Get User
+@app.get("/users", status_code=200, response_model=List[schemas.UserResponse])
+def get_user(db: Session = Depends(get_db)):
+
+    users = db.query(models.User).all()
+
+    return users
