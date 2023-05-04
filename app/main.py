@@ -34,7 +34,7 @@ async def root():
 
 # Get Post
 @app.get("/posts", response_model=List[schemas.PostResponse])
-def getPost(db: Session = Depends(get_db)):
+def get_posts(db: Session = Depends(get_db)):
 
     posts = db.query(models.Post).all()
 
@@ -43,7 +43,7 @@ def getPost(db: Session = Depends(get_db)):
 
 # Create Post
 @app.post("/posts", status_code=201, response_model=schemas.PostResponse)
-def createPost(post: schemas.CreatePost, db: Session = Depends(get_db)):
+def create_post(post: schemas.CreatePost, db: Session = Depends(get_db)):
 
     new_post = models.Post(**post.dict())
     db.add(new_post)
@@ -108,6 +108,11 @@ def create_user(user: schemas.CreateUser, db: Session = Depends(get_db)):
     user.password = hashed_password
 
     new_user = models.User(**user.dict())
+
+    # Check email is already exist
+    if new_user.email == user.email:
+        raise HTTPException(status_code=409, detail=f"Email already exist.")
+
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -115,9 +120,21 @@ def create_user(user: schemas.CreateUser, db: Session = Depends(get_db)):
     return new_user
 
 
-# Get User
+# Get single user
+@app.get("/users/{id}", response_model=schemas.UserResponse)
+def get_user(id: int, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == id).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=404, detail=f"User with id {id} doesn't exist")
+
+    return user
+
+
+# Get all user
 @app.get("/users", status_code=200, response_model=List[schemas.UserResponse])
-def get_user(db: Session = Depends(get_db)):
+def get_users(db: Session = Depends(get_db)):
 
     users = db.query(models.User).all()
 
