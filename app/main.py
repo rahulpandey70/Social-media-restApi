@@ -5,20 +5,13 @@ from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
-from . import models
+from . import models, schemas
 from .database import engine, get_db
 from sqlalchemy.orm import Session
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
-
-class Post(BaseModel):
-    title: str
-    content: str
-    published: bool = True
-
 
 # connect to database
 while True:
@@ -45,23 +38,23 @@ def getPost(db: Session = Depends(get_db)):
 
     posts = db.query(models.Post).all()
 
-    return {"data": posts}
+    return posts
 
 
 # Create Post
-@app.post("/posts", status_code=201)
-def createPost(post: Post, db: Session = Depends(get_db)):
+@app.post("/posts", status_code=201, response_model=schemas.PostResponse)
+def createPost(post: schemas.CreatePost, db: Session = Depends(get_db)):
 
     new_post = models.Post(**post.dict())
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
 
-    return {"data": new_post}
+    return new_post
 
 
 # Get Single Post
-@app.get("/posts/{id}")
+@app.get("/posts/{id}", response_model=schemas.PostResponse)
 def get_post(id: int, db: Session = Depends(get_db)):
 
     post = db.query(models.Post).filter(models.Post.id == id).first()
@@ -70,7 +63,7 @@ def get_post(id: int, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=404, detail=f"post with id {id} not found")
 
-    return {"post detail": post}
+    return post
 
 
 # Delete Post
@@ -90,8 +83,8 @@ def delete_post(id: int, db: Session = Depends(get_db)):
 
 
 # Update Post
-@app.put("/posts/{id}")
-def update_post(id: int, post: Post, db: Session = Depends(get_db)):
+@app.put("/posts/{id}", response_model=schemas.PostResponse)
+def update_post(id: int, post: schemas.CreatePost, db: Session = Depends(get_db)):
 
     updatedPost = db.query(models.Post).filter(models.Post.id == id)
 
@@ -103,4 +96,4 @@ def update_post(id: int, post: Post, db: Session = Depends(get_db)):
 
     db.commit()
 
-    return {"data": updatedPost.first()}
+    return updatedPost.first()
