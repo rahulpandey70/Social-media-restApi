@@ -1,6 +1,6 @@
 from fastapi import Body, FastAPI, Response, HTTPException, Depends
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -33,7 +33,7 @@ async def root():
 
 
 # Get Post
-@app.get("/posts")
+@app.get("/posts", response_model=List[schemas.PostResponse])
 def getPost(db: Session = Depends(get_db)):
 
     posts = db.query(models.Post).all()
