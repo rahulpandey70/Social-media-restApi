@@ -1,6 +1,17 @@
 # Creating Social Media Rest Api Using Fast Api
 
-    In this rest api i'm using FastApi and Postgres Database to store data.
+<br>
+
+## 🖥️ Tech Stack
+
+1. Python
+2. FastApi
+3. PostgresSql
+4. Pydantic
+
+**NOTE :- Pydantic help to validate data using python.**
+
+<br>
 
 ## Getting Started
 
@@ -18,7 +29,7 @@
             pip install psycopg2-binary
 
     install 'sqlalchemy'
-    This is a python SQL toolkit and ORM(Object Relational Mapper) that gives you flexibility to wirte sql query
+    This is a python SQL toolkit and ORM(Object Relational Mapper) that gives you flexibility to wirte sql query and defining models
         command:-
             pip install sqlalchemy
 
