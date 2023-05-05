@@ -5,7 +5,8 @@ from ..database import get_db
 from .. import models, schemas, utils
 
 router = APIRouter(
-    prefix="/users"
+    prefix="/users",
+    tags=["Users"]
 )
 
 
@@ -18,10 +19,6 @@ def create_user(user: schemas.CreateUser, db: Session = Depends(get_db)):
     user.password = hashed_password
 
     new_user = models.User(**user.dict())
-
-    # Check email is already exist
-    if new_user.email == user.email:
-        raise HTTPException(status_code=409, detail=f"Email already exist.")
 
     db.add(new_user)
     db.commit()
