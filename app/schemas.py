@@ -9,6 +9,15 @@ class PostBase(BaseModel):
     published: bool = True
 
 
+class UserResponse(BaseModel):
+    id: int
+    email: EmailStr
+    created_At: datetime
+
+    class Config:
+        orm_mode = True
+
+
 class CreatePost(PostBase):
     pass
 
@@ -16,6 +25,8 @@ class CreatePost(PostBase):
 class PostResponse(PostBase):
     id: int
     created_At: datetime
+    owner_id: int
+    owner: UserResponse
 
     class Config:
         orm_mode = True
@@ -24,15 +35,6 @@ class PostResponse(PostBase):
 class CreateUser(BaseModel):
     email: EmailStr
     password: str
-
-
-class UserResponse(BaseModel):
-    id: int
-    email: EmailStr
-    created_At: datetime
-
-    class Config:
-        orm_mode = True
 
 
 class UserLogin(BaseModel):
