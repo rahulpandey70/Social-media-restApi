@@ -2,7 +2,7 @@ from fastapi import HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
 from typing import List
 from ..database import get_db
-from .. import models, schemas
+from .. import models, schemas, oauth2
 
 router = APIRouter(
     prefix="/posts",
@@ -12,7 +12,7 @@ router = APIRouter(
 
 # Get Post
 @router.get("/", response_model=List[schemas.PostResponse])
-def get_posts(db: Session = Depends(get_db)):
+def get_posts(db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
 
     posts = db.query(models.Post).all()
 
@@ -21,8 +21,9 @@ def get_posts(db: Session = Depends(get_db)):
 
 # Create Post
 @router.post("/", status_code=201, response_model=schemas.PostResponse)
-def create_post(post: schemas.CreatePost, db: Session = Depends(get_db)):
+def create_post(post: schemas.CreatePost, db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
 
+    print(user_id)
     new_post = models.Post(**post.dict())
     db.add(new_post)
     db.commit()
@@ -33,7 +34,7 @@ def create_post(post: schemas.CreatePost, db: Session = Depends(get_db)):
 
 # Get Single Post
 @router.get("/{id}", response_model=schemas.PostResponse)
-def get_post(id: int, db: Session = Depends(get_db)):
+def get_post(id: int, db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
 
     post = db.query(models.Post).filter(models.Post.id == id).first()
 
@@ -46,7 +47,7 @@ def get_post(id: int, db: Session = Depends(get_db)):
 
 # Delete Post
 @router.delete("/{id}", status_code=204)
-def delete_post(id: int, db: Session = Depends(get_db)):
+def delete_post(id: int, db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
 
     deletedPost = db.query(models.Post).filter(models.Post.id == id)
 
@@ -62,7 +63,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
 
 # Update Post
 @router.put("/{id}", response_model=schemas.PostResponse)
-def update_post(id: int, post: schemas.CreatePost, db: Session = Depends(get_db)):
+def update_post(id: int, post: schemas.CreatePost, db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
 
     updatedPost = db.query(models.Post).filter(models.Post.id == id)
 
