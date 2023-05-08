@@ -8,6 +8,9 @@
 2. FastApi
 3. PostgresSql
 4. Pydantic
+5. Alembic
+
+**PostgresSql has a limitation, it does not migrate database once table is created, So we use alembic that help to migrate on every changes in postgresSql. models**
 
 **NOTE :- Pydantic help to validate data using python.**
 
