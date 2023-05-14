@@ -9,6 +9,8 @@
 3. PostgresSql
 4. Pydantic
 5. Alembic
+6. Docker
+7. Docker Compose
 
 **PostgresSql has a limitation, it does not migrate database once table is created, So we use alembic that help to migrate on every changes in postgresSql. models**
 
