@@ -24,6 +24,10 @@
         Command:-
             python3 -m venv <NameOfYourEnvironment>
 
+    Activate virtual env
+        Command:-
+            source venv/bin/activate
+
     Install all packages
         Command:-
             pip install -r requirements.txt
