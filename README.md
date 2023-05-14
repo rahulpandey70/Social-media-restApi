@@ -24,19 +24,9 @@
         Command:-
             python3 -m venv <NameOfYourEnvironment>
 
-    Install fast api
+    Install all packages
         Command:-
-            pip install fastapi[all]
-
-    Install 'psycopg2-binary'
-    This is a postgresql database adapter that will connect to your postgressql database
-        Command:-
-            pip install psycopg2-binary
-
-    install 'sqlalchemy'
-    This is a python SQL toolkit and ORM(Object Relational Mapper) that gives you flexibility to wirte sql query and defining models
-        command:-
-            pip install sqlalchemy
+            pip install -r requirements.txt
 
 ## To run locally
 
@@ -44,3 +34,8 @@
         uvicorn app.main:app --reload
 
     This command will continuously check if anything you do changes in your file.
+
+## To run using docker compose
+
+    Use Command:
+        docker compose -f docker-compose-dev.yml up
